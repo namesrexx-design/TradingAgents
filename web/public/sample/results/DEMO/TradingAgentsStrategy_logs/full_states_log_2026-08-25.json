@@ -1,0 +1,39 @@
+{
+    "company_of_interest": "DEMO",
+    "trade_date": "2026-08-25",
+    "market_report": "SAMPLE — illustrative, not real analysis. Fictional ticker, made-up readings.\n\n## Technical picture for DEMO (fictional), as of 2026-08-25\n\nPrice is sitting right on its 50-day average after a two-week drift lower. Momentum is flat.\n\n| Indicator | Reading (SAMPLE) | What it suggests |\n|---|---|---|\n| close_50_sma | 47.90 | Price on it: no edge either way |\n| rsi | 49 | Neutral |\n| macd | 0.05 below signal | Flat, no crossover |",
+    "sentiment_report": "",
+    "news_report": "SAMPLE — illustrative, not real analysis. Invented headlines.\n\n- Demo Widgets Co. confirmed a launch window but gave no date.\n- No macro series were read for this sample.",
+    "fundamentals_report": "",
+    "investment_debate_state": {
+        "bull_history": "\nBull Analyst: SAMPLE — illustrative, not real analysis. The long-term trend is intact and a launch window is confirmed. Waiting costs little, but the setup is close.",
+        "bear_history": "\nBear Analyst: SAMPLE — illustrative, not real analysis. Without a date, the catalyst is a promise. Flat momentum on the 50-day average is a coin flip.",
+        "history": "\nBull Analyst: SAMPLE — illustrative, not real analysis. The long-term trend is intact and a launch window is confirmed. Waiting costs little, but the setup is close.\nBear Analyst: SAMPLE — illustrative, not real analysis. Without a date, the catalyst is a promise. Flat momentum on the 50-day average is a coin flip.",
+        "current_response": "Bear Analyst: SAMPLE — illustrative, not real analysis. Without a date, the catalyst is a promise. Flat momentum on the 50-day average is a coin flip."
+    },
+    "trader_investment_plan": "**Action**: Hold\n\n**Reasoning**: SAMPLE — illustrative, not real analysis. The evidence is balanced and the catalyst has no date yet. Wait for one.\n\n**Entry Price**: not provided\n\n**Stop Loss**: not provided\n\n**Position Sizing**: not provided\n\nFINAL TRANSACTION PROPOSAL: **HOLD**",
+    "risk_debate_state": {
+        "aggressive_history": "\nAggressive Analyst: SAMPLE — illustrative, not real analysis. Waiting risks missing the move once the date lands.",
+        "conservative_history": "\nConservative Analyst: SAMPLE — illustrative, not real analysis. Nothing is lost by waiting for a date.",
+        "neutral_history": "\nNeutral Analyst: SAMPLE — illustrative, not real analysis. Hold, and set a reminder for the date announcement.",
+        "history": "\nAggressive Analyst: SAMPLE — illustrative, not real analysis. Waiting risks missing the move once the date lands.\nConservative Analyst: SAMPLE — illustrative, not real analysis. Nothing is lost by waiting for a date.\nNeutral Analyst: SAMPLE — illustrative, not real analysis. Hold, and set a reminder for the date announcement."
+    },
+    "investment_plan": "**Recommendation**: Hold\n\n**Rationale**: SAMPLE — illustrative, not real analysis. The two sides were genuinely balanced and the evidence was thin: two analysts only.\n\n**Strategic Actions**: SAMPLE — illustrative, not real analysis. No paper position. Revisit when the launch date is announced.",
+    "final_trade_decision": "**Rating**: Hold\n\n**Executive Summary**: SAMPLE — illustrative, not real analysis. No position this round; revisit when the launch has a date.\n\n**Investment Thesis**: SAMPLE — illustrative, not real analysis. Flat momentum and an undated catalyst leave no edge. A thinner run (market and news only) also argues for caution.\n\n**Price Target**: not provided\n\n**Time Horizon**: not provided",
+    "final_rating": "Hold",
+    "run_settings": {
+        "version": "0.5.2",
+        "llm_provider": "SAMPLE (no model was called)",
+        "deep_think_llm": "SAMPLE",
+        "quick_think_llm": "SAMPLE",
+        "analysts": [
+            "market",
+            "news"
+        ],
+        "max_debate_rounds": 1,
+        "max_risk_discuss_rounds": 1,
+        "output_language": "English",
+        "data_vendors": {},
+        "tool_vendors": {}
+    }
+}

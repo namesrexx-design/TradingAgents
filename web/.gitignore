@@ -1,0 +1,4 @@
+node_modules/
+dist/
+# The root .gitignore drops reports/ (real run output); the bundled SAMPLE tree is kept.
+!public/sample/results/reports/

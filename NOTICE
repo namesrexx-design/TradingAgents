@@ -1,0 +1,20 @@
+TradingAgents
+Copyright Tauric Research and the TradingAgents contributors.
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+Original project: https://github.com/TauricResearch/TradingAgents
+
+This fork: https://github.com/namesrexx-design/TradingAgents
+
+Modified by BizBox: added web dashboard.
+  - web/: a browser dashboard for TradingAgents runs (run setup, live run view,
+    final report, past runs), an adapter for the run output the framework
+    writes, a bundled SAMPLE run for preview (fictional ticker DEMO, marked
+    "SAMPLE — illustrative, not real analysis"), and a server-side bridge stub
+    (web/bridge/server.py).
+  - docs/design/refero/wealthsimple/: the design tokens the dashboard is styled
+    with (style reference only; no third-party logos or marks are used).
+  - README.md: a section describing these changes.
+No file of the original framework under tradingagents/ or cli/ was changed.
+
+The dashboard is a research tool. It is not financial advice, and it places no
+orders: it has no broker integration.

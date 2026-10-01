@@ -1,0 +1,58 @@
+{
+  "sample": true,
+  "note": "SAMPLE — illustrative, not real analysis. Fictional ticker DEMO; no model or market data was used.",
+  "runs": [
+    {
+      "ticker": "DEMO",
+      "trade_date": "2026-09-01",
+      "rating": "Overweight",
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "state_log": "sample/results/DEMO/TradingAgentsStrategy_logs/full_states_log_2026-09-01.json",
+      "report_dir": "sample/results/reports/DEMO_20260901_090000",
+      "report_files": [
+        "1_analysts/fundamentals.md",
+        "1_analysts/market.md",
+        "1_analysts/news.md",
+        "1_analysts/sentiment.md",
+        "2_research/bear.md",
+        "2_research/bull.md",
+        "2_research/manager.md",
+        "3_trading/trader.md",
+        "4_risk/aggressive.md",
+        "4_risk/conservative.md",
+        "4_risk/neutral.md",
+        "5_portfolio/decision.md",
+        "complete_report.md"
+      ]
+    },
+    {
+      "ticker": "DEMO",
+      "trade_date": "2026-08-25",
+      "rating": "Hold",
+      "analysts": [
+        "market",
+        "news"
+      ],
+      "state_log": "sample/results/DEMO/TradingAgentsStrategy_logs/full_states_log_2026-08-25.json",
+      "report_dir": "sample/results/reports/DEMO_20260825_090000",
+      "report_files": [
+        "1_analysts/market.md",
+        "1_analysts/news.md",
+        "2_research/bear.md",
+        "2_research/bull.md",
+        "2_research/manager.md",
+        "3_trading/trader.md",
+        "4_risk/aggressive.md",
+        "4_risk/conservative.md",
+        "4_risk/neutral.md",
+        "5_portfolio/decision.md",
+        "complete_report.md"
+      ]
+    }
+  ]
+}

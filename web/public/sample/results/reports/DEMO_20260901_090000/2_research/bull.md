@@ -1,0 +1,2 @@
+
+Bull Analyst: SAMPLE — illustrative, not real analysis. The trend is doing what we want: price is above both moving averages and the MACD crossover came on a clean pullback, not a spike. The refresh gives a concrete catalyst, the balance sheet is net cash, and the bear's margin point is a one-point move, not a collapse. I'd lean in, sized so a failed launch costs us little.
