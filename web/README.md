@@ -6,7 +6,23 @@ Research tool. Not financial advice. No orders are placed. There is no broker in
 A browser view of TradingAgents runs: run setup, a live run view (each agent's
 stage, its output, the bull vs. bear and risk debates), the final report, and
 past runs. Styled from the Refero Wealthsimple export in
-`docs/design/refero/wealthsimple/` (`tokens.css` is imported as-is).
+`docs/design/refero/wealthsimple/`.
+
+## Styling: what comes from the export, what is ours
+
+- **Straight from the export's code** (`docs/design/refero/wealthsimple/`, unchanged): `tokens.css`
+  (loaded in `src/main.jsx`) and `tailwind.css`, the Tailwind v4 `@theme`, imported verbatim in
+  `src/styles/index.css`. Every color, font, size, spacing and radius utility the components use
+  (`bg-bronze-field`, `text-graphite-ink`, `font-tiempos`, `text-display`, `p-32`, `rounded-full` = 100px,
+  `rounded-full-2` = 1600px) is generated from it.
+- **Ours, implementing DESIGN.md's written specs** (the export ships no component source):
+  `src/styles/theme-extensions.css` (letter-spacings and a line-height DESIGN.md states in prose, the
+  page max-width alias, the line-draw animation), `src/components/recipes.js` (nav, pill buttons,
+  soft cards, inputs, eyebrows, feature columns, each quoting its spec), the screens, and the
+  sculpture in `scripts/hero-scene.html` (three.js), rendered to `art/*.png` (lossless) and
+  `src/assets/*.webp` by `npm run render:hero`.
+- Fonts: DESIGN.md's substitutes (Source Serif 4, Inter) registered under the export's family names
+  in `src/styles/fonts.css`.
 
 ## Preview (no Python, no keys)
 

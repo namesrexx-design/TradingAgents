@@ -13,6 +13,7 @@ import { buildReplayEvents, initialLiveState, reduceLive, replayDelay } from '..
 import { subscribeRun } from '../data/source.js';
 import Markdown from '../components/Markdown.jsx';
 import { Eyebrow, RatingBadge, SampleBanner, StatusPill } from '../components/ui.jsx';
+import { btn, button, card, cardTitle, container, focusRing, heading, headingLg } from '../components/recipes.js';
 
 function liveReducer(state, action) {
   if (action.type === '__reset') return initialLiveState(action.analysts);
@@ -34,12 +35,12 @@ function useReveal(content, key, speed) {
 function DebateColumn({ title, turns, speaker }) {
   const mine = turns.filter((t) => t.speaker === speaker);
   return (
-    <div className="debate-col">
-      <p className="debate-col-title">{title}</p>
-      {mine.length === 0 && <p className="muted small">Waiting for the first argument.</p>}
+    <div className="min-w-0 border-t border-stone pt-16">
+      <p className="mb-12 text-subheading font-medium">{title}</p>
+      {mine.length === 0 && <p className="text-caption text-pebble">Waiting for the first argument.</p>}
       {mine.map((t, i) => (
-        <div className="turn" key={i}>
-          <p className="turn-meta">Turn {i + 1}</p>
+        <div key={i} className="border-t border-stone py-12 text-caption leading-caption first-of-type:border-t-0 first-of-type:pt-0 motion-safe:animate-rise">
+          <p className="mb-6 text-pebble">Turn {i + 1}</p>
           <Markdown text={t.text} />
         </div>
       ))}
@@ -126,55 +127,60 @@ export default function Live({ ctx, liveId }) {
 
   if (liveId && bridge === null) {
     return (
-      <section className="section"><div className="container">
-        <Eyebrow>Live run</Eyebrow>
-        <h1 className="heading">The bridge is not running.</h1>
-        <p className="lede">This link follows a run on the local bridge. Start web/bridge/server.py, or <a href="#/live">replay the sample</a>.</p>
-      </div></section>
+      <section className="bg-paper-white py-80">
+        <div className={container}>
+          <Eyebrow>Live run</Eyebrow>
+          <h1 className={`${heading} mb-16`}>The bridge is not running.</h1>
+          <p className="text-subheading leading-subheading">
+            This link follows a run on the local bridge. Start web/bridge/server.py, or <a className="underline" href="#/live">replay the sample</a>.
+          </p>
+        </div>
+      </section>
     );
   }
 
+
   return (
-    <section className="section section-tight">
-      <div className="container">
-        <div className="page-head">
-          <div>
+    <section className="bg-paper-white pt-48 pb-80">
+      <div className={container}>
+        <div className="mb-32 flex flex-wrap items-end justify-between gap-24">
+          <div className="min-w-0">
             <Eyebrow>{isLive ? 'Live run · streamed from the bridge' : 'Replay · rebuilt from a finished run'}</Eyebrow>
-            <h1 className="heading">
+            <h1 className={`${headingLg} max-md:text-heading max-md:leading-heading`}>
               {state.ticker || replayRun?.ticker || '…'}
-              <span className="heading-soft"> · {state.tradeDate || replayRun?.tradeDate || ''}</span>
+              <span className="font-normal text-pebble"> · {state.tradeDate || replayRun?.tradeDate || ''}</span>
             </h1>
           </div>
           {!isLive && (
-            <div className="controls" aria-label="Replay controls">
-              <button type="button" className="btn btn-small btn-outline" onClick={() => setPlaying((p) => !p)}
+            <div className="grid w-full grid-cols-2 gap-8 sm:flex sm:w-auto sm:flex-wrap" aria-label="Replay controls">
+              <button type="button" className={`${btn('outline', 'sm')} ${focusRing}`} onClick={() => setPlaying((p) => !p)}
                 disabled={!events || cursor >= events.length}>{playing ? 'Pause' : 'Resume'}</button>
-              <button type="button" className="btn btn-small btn-outline" onClick={() => setSpeed((s) => (s === 1 ? 4 : 1))}>
-                Speed {speed}x</button>
-              <button type="button" className="btn btn-small btn-outline" onClick={skip} disabled={!events || cursor >= events.length}>Skip to end</button>
-              <button type="button" className="btn btn-small btn-ghost" onClick={restart} disabled={!events}>Restart</button>
+              <button type="button" className={`${btn('outline', 'sm')} ${focusRing}`} onClick={() => setSpeed((s) => (s === 1 ? 4 : 1))}>Speed {speed}x</button>
+              <button type="button" className={`${btn('outline', 'sm')} ${focusRing}`} onClick={skip} disabled={!events || cursor >= events.length}>Skip to end</button>
+              <button type="button" className={`${btn('ghost', 'sm')} ${focusRing}`} onClick={restart} disabled={!events}>Restart</button>
             </div>
           )}
         </div>
 
-        {sample && <SampleBanner />}
-        {loadError && <p className="run-error" role="alert">{loadError}</p>}
-        {state.error && <p className="run-error" role="alert">{state.error}</p>}
+        {sample && <SampleBanner className="mb-32" />}
+        {loadError && <p className="mb-16 border-l border-graphite-ink pl-12 text-caption" role="alert">{loadError}</p>}
+        {state.error && <p className="mb-16 border-l border-graphite-ink pl-12 text-caption" role="alert">{state.error}</p>}
 
-        <div className="progress" aria-label={`${done} of ${total} agents done`}>
-          <div className="progress-bar" style={{ width: `${(done / total) * 100}%` }} />
+        <div className="h-px overflow-hidden bg-stone" aria-label={`${done} of ${total} agents done`}>
+          <div className="h-full bg-graphite-ink transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${(done / total) * 100}%` }} />
         </div>
-        <p className="progress-label">{done} of {total} agents done{state.done ? ' · run complete' : ''}</p>
+        <p className="mt-8 mb-32 text-caption text-pebble">{done} of {total} agents done{state.done ? ' · run complete' : ''}</p>
 
-        <div className="live-grid">
-          <aside className="pipeline" aria-label="Pipeline">
+        <div className="grid items-start gap-24 lg:grid-cols-[340px_minmax(0,1fr)]">
+          {/* Pipeline: a Soft Card Surface. On phones it follows the writing panel. */}
+          <aside className={`${card} order-2 lg:sticky lg:top-24 lg:order-none`} aria-label="Pipeline">
             {groups.map((g) => (
-              <div className="pipeline-group" key={g.team}>
-                <p className="pipeline-team">{g.team}</p>
+              <div className="mb-24" key={g.team}>
+                <p className="mb-4 text-caption text-pebble">{g.team}</p>
                 <ul>
                   {g.agents.map((a) => (
-                    <li key={a} className={`pipeline-row ${state.agents[a] === 'in_progress' ? 'is-working' : ''}`}>
-                      <span>{a}</span>
+                    <li key={a} className="flex items-center justify-between gap-12 border-b border-stone py-12">
+                      <span className={state.agents[a] === 'in_progress' ? 'font-medium' : ''}>{a}</span>
                       <StatusPill status={state.agents[a] || 'pending'} />
                     </li>
                   ))}
@@ -182,49 +188,52 @@ export default function Live({ ctx, liveId }) {
               </div>
             ))}
             {state.done && (
-              <div className="pipeline-done">
-                <p className="pipeline-team">Research rating</p>
-                <p className="pipeline-rating"><RatingBadge rating={state.rating} /></p>
-                <a className="btn btn-primary btn-block" href={reportHref}>Open the report</a>
+              <div className="grid justify-items-start gap-12">
+                <p className="text-caption text-pebble">Research rating</p>
+                <RatingBadge rating={state.rating} />
+                <a className={`${button.primary} ${focusRing}`} href={reportHref}>Open the report</a>
               </div>
             )}
           </aside>
 
-          <div className="live-main">
-            <div className="panel now">
-              <div className="panel-head">
-                <p className="panel-title">{state.current ? state.current.title : 'Waiting for the first report'}</p>
-                {state.current && <span className="muted small">{writing ? 'Writing…' : 'Filed'}</span>}
+          <div className="contents lg:grid lg:min-w-0 lg:gap-24">
+            <div className={`${card} order-1 min-h-[280px] lg:order-none`}>
+              <div className="mb-16 flex items-baseline justify-between gap-12">
+                <p className={cardTitle}>{state.current ? state.current.title : 'Waiting for the first report'}</p>
+                {state.current && <span className="text-caption text-pebble">{writing ? 'Writing…' : 'Filed'}</span>}
               </div>
               {state.current
-                ? <Markdown text={revealed} className={writing ? 'is-writing' : ''} />
-                : <p className="muted">The analysts start together. Their reports land here as each one files.</p>}
+                ? <><Markdown text={revealed} />{writing && <span aria-hidden="true" className="inline-block h-16 w-px bg-graphite-ink align-text-bottom" />}</>
+                : <p className="text-pebble">The analysts start together. Their reports land here as each one files.</p>}
             </div>
 
-            <div className="block">
+            <div className={`${card} order-3 lg:order-none`}>
               <Eyebrow>Research debate</Eyebrow>
-              <h2 className="subheading">Bull vs. bear</h2>
-              <div className="debate">
+              <h2 className={`${cardTitle} mb-24`}>Bull vs. bear</h2>
+              <div className="grid gap-32 md:grid-cols-2">
                 <DebateColumn title="Bull researcher" speaker="Bull Analyst" turns={state.investTurns} />
                 <DebateColumn title="Bear researcher" speaker="Bear Analyst" turns={state.investTurns} />
               </div>
             </div>
 
-            <div className="block">
+            <div className={`${card} order-3 lg:order-none`}>
               <Eyebrow>Risk debate</Eyebrow>
-              <h2 className="subheading">Three views on the trader's paper plan</h2>
-              <div className="debate debate-3">
+              <h2 className={`${cardTitle} mb-24`}>Three views on the trader&apos;s paper plan</h2>
+              <div className="grid gap-24 xl:grid-cols-3">
                 <DebateColumn title="Aggressive" speaker="Aggressive Analyst" turns={state.riskTurns} />
                 <DebateColumn title="Conservative" speaker="Conservative Analyst" turns={state.riskTurns} />
                 <DebateColumn title="Neutral" speaker="Neutral Analyst" turns={state.riskTurns} />
               </div>
             </div>
 
-            <div className="block">
+            <div className={`${card} order-3 lg:order-none`}>
               <Eyebrow>Activity</Eyebrow>
-              <ol className="log" ref={logRef}>
+              <ol className="max-h-[260px] overflow-y-auto text-caption leading-caption" ref={logRef}>
                 {state.log.map((l, i) => (
-                  <li key={i}><span className="log-agent">{l.agent}</span><span className="log-text">{l.content}</span></li>
+                  <li key={i} className="flex gap-12 border-b border-stone py-8">
+                    <span className="w-[120px] shrink-0 text-pebble sm:w-[150px]">{l.agent}</span>
+                    <span className="min-w-0 break-words">{l.content}</span>
+                  </li>
                 ))}
               </ol>
             </div>

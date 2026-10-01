@@ -12,7 +12,11 @@ import { Fragment } from 'react';
 import { SAMPLE_MARKER } from '../data/adapter.js';
 
 export function SampleTag({ children = 'SAMPLE — illustrative, not real analysis' }) {
-  return <span className="sample-tag">{children}</span>;
+  return (
+    <span className="mr-6 inline-flex max-w-full items-center whitespace-nowrap rounded-full-2 border border-dashed border-pebble bg-fog-veil px-8 font-wealthsimple-sans text-caption leading-control tracking-control text-graphite-ink [.on-dark_&]:border-paper-white/70 [.on-dark_&]:bg-transparent [.on-dark_&]:text-paper-white">
+      {children}
+    </span>
+  );
 }
 
 function inline(text, keyBase = 'i') {
@@ -34,8 +38,8 @@ function inline(text, keyBase = 'i') {
     if (mIdx > 0) out.push(rest.slice(0, mIdx));
     const tok = m[0];
     const key = `${keyBase}${k++}`;
-    if (tok.startsWith('**')) out.push(<strong key={key}>{inline(tok.slice(2, -2), key)}</strong>);
-    else if (tok.startsWith('`')) out.push(<code key={key}>{tok.slice(1, -1)}</code>);
+    if (tok.startsWith('**')) out.push(<strong key={key} className="font-medium">{inline(tok.slice(2, -2), key)}</strong>);
+    else if (tok.startsWith('`')) out.push(<code key={key} className="rounded-sm bg-fog-veil px-4 font-mono text-caption">{tok.slice(1, -1)}</code>);
     else out.push(<em key={key}>{inline(tok.slice(1, -1), key)}</em>);
     rest = rest.slice(mIdx + tok.length);
   }
@@ -96,30 +100,30 @@ function parseBlocks(src) {
 export default function Markdown({ text, className = '' }) {
   const blocks = parseBlocks(text);
   return (
-    <div className={`md ${className}`}>
+    <div className={`min-w-0 ${className}`}>
       {blocks.map((b, n) => {
         const key = `b${n}`;
         if (b.t === 'h') {
-          const Tag = b.level <= 2 ? 'h4' : 'h5';
-          return <Tag key={key}>{inline(b.text, key)}</Tag>;
+          if (b.level <= 2) return <h4 key={key} className="mt-32 mb-12 font-the-future font-medium text-heading-sm leading-heading-sm first:mt-0">{inline(b.text, key)}</h4>;
+          return <h5 key={key} className="mt-24 mb-8 font-the-future font-medium text-subheading leading-subheading first:mt-0">{inline(b.text, key)}</h5>;
         }
-        if (b.t === 'hr') return <hr key={key} />;
+        if (b.t === 'hr') return <hr key={key} className="my-24 border-0 border-t border-stone" />;
         if (b.t === 'table') {
           return (
-            <div className="md-table" key={key} role="region" aria-label="Table" tabIndex={0}>
-              <table>
-                <thead><tr>{b.head.map((c, j) => <th key={j}>{inline(c, `${key}h${j}`)}</th>)}</tr></thead>
-                <tbody>{b.rows.map((r, j) => <tr key={j}>{r.map((c, x) => <td key={x}>{inline(c, `${key}r${j}${x}`)}</td>)}</tr>)}</tbody>
+            <div className="mb-24 max-w-full overflow-x-auto last:mb-0" key={key} role="region" aria-label="Table" tabIndex={0}>
+              <table className="w-full border-collapse text-caption leading-caption">
+                <thead><tr>{b.head.map((c, j) => <th key={j} className="border-b border-stone py-8 pr-12 text-left align-top font-medium text-pebble">{inline(c, `${key}h${j}`)}</th>)}</tr></thead>
+                <tbody>{b.rows.map((r, j) => <tr key={j}>{r.map((c, x) => <td key={x} className="border-b border-stone py-8 pr-12 text-left align-top">{inline(c, `${key}r${j}${x}`)}</td>)}</tr>)}</tbody>
               </table>
             </div>
           );
         }
         if (b.t === 'ul' || b.t === 'ol') {
           const Tag = b.t;
-          return <Tag key={key}>{b.items.map((it, j) => <li key={j}>{inline(it, `${key}l${j}`)}</li>)}</Tag>;
+          return <Tag key={key} className={`mb-16 pl-24 last:mb-0 ${b.t === 'ol' ? 'list-decimal' : 'list-disc'}`}>{b.items.map((it, j) => <li key={j} className="mb-6">{inline(it, `${key}l${j}`)}</li>)}</Tag>;
         }
         return (
-          <p key={key}>
+          <p key={key} className="mb-16 last:mb-0">
             {b.lines.map((l, j) => (
               <Fragment key={j}>{j > 0 && <br />}{inline(l, `${key}p${j}`)}</Fragment>
             ))}

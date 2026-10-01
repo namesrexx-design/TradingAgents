@@ -1,0 +1,50 @@
+/*
+ * TradingAgents web dashboard: additions to the export's Tailwind theme.
+ * Modified by BizBox: added web dashboard. Licensed under the Apache License 2.0
+ * (see LICENSE and NOTICE at the repository root).
+ *
+ * The export's tailwind.css is imported verbatim (see index.css). It has no
+ * variables for the few values below, which DESIGN.md states in prose, so they
+ * are added here, each with the line of DESIGN.md it comes from. Nothing in
+ * the export's @theme is redefined.
+ */
+@theme {
+  /* "Wealthsimple Sans … 16px with 0.025em letter-spacing" — buttons, nav controls */
+  --tracking-control: 0.025em;
+  /* "Wealthsimple Sans … Line height: 1.20" */
+  --leading-control: 1.2;
+  /* "Tiempos … Letter spacing: -0.01em (slightly negative on display)" */
+  --tracking-editorial: -0.01em;
+  /* "The Future … Letter spacing: 0.0050em" — body and UI */
+  --tracking-body: 0.005em;
+  /* "Page max-width: 1200px" — tokens.css --page-max-width, exposed as max-w-page */
+  --container-page: var(--page-max-width);
+
+  /* The live site's hero draws a thin line across the field; here it is a
+     chart path, drawn once with stroke-dashoffset (see BronzeHero). */
+  --animate-draw-line: draw-line 3.2s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+  @keyframes draw-line {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+  /* Debate turns settle in as they arrive. */
+  --animate-rise: rise 300ms ease both;
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(var(--spacing-6)); }
+  }
+  --animate-pulse-dot: pulse-dot 1s ease-in-out infinite;
+  @keyframes pulse-dot {
+    50% { opacity: 0.2; }
+  }
+}
+
+/* The Text Input spec: "Placeholder text in Pebble". */
+@layer base {
+  body {
+    background-color: var(--color-paper-white);
+    color: var(--color-graphite-ink);
+    font-family: var(--font-the-future);
+    letter-spacing: var(--tracking-body);
+  }
+  input::placeholder { color: var(--color-pebble); opacity: 1; }
+}

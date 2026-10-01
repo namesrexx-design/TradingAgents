@@ -9,22 +9,37 @@
  */
 import { useEffect, useState } from 'react';
 import Markdown, { Inline } from '../components/Markdown.jsx';
-import { Eyebrow, KeyValue, RatingScale, SampleBanner, analystLabel } from '../components/ui.jsx';
+import { BronzeHero, Eyebrow, KeyValue, RatingScale, SampleBanner, analystLabel, heroText } from '../components/ui.jsx';
+import { button, card, container, focusRing, heading } from '../components/recipes.js';
 import { go } from '../router.js';
 
-function Turns({ turns, speakers }) {
-  if (!turns.length) return <p className="muted">No turns were recorded.</p>;
+function Turns({ turns }) {
+  if (!turns.length) return <p className="text-pebble">No turns were recorded.</p>;
   return (
-    <ol className="turns">
+    <ol className="mt-24 max-w-[48em]">
       {turns.map((t, i) => (
-        <li key={i} className={`turn-row turn-${speakers.indexOf(t.speaker)}`}>
-          <p className="turn-speaker">{t.speaker.replace(' Analyst', '')}</p>
-          <div className="turn-body"><Markdown text={t.text} /></div>
+        <li key={i} className="grid gap-8 border-t border-stone py-20 md:grid-cols-[140px_minmax(0,1fr)] md:gap-24">
+          <p className="font-medium">{t.speaker.replace(' Analyst', '')}</p>
+          <div className="min-w-0"><Markdown text={t.text} /></div>
         </li>
       ))}
     </ol>
   );
 }
+
+/* A report section is a Soft Card Surface: Linen Cream, 100px radius, 32px padding. */
+function Section({ id, eyebrowText, title, children }) {
+  return (
+    <article id={id} className={`${card} scroll-mt-24`}>
+      <Eyebrow>{eyebrowText}</Eyebrow>
+      <h2 className={`${heading} mb-16 max-md:text-heading-sm max-md:leading-heading-sm`}>{title}</h2>
+      {children}
+    </article>
+  );
+}
+
+const subTitle = 'mt-32 mb-12 font-the-future font-medium text-subheading leading-subheading';
+const prose = 'max-w-[44em]';
 
 export default function Report({ ctx, ticker, date, source }) {
   const { index, indexError, getRun } = ctx;
@@ -45,11 +60,20 @@ export default function Report({ ctx, ticker, date, source }) {
   }, [index, entry?.ticker, entry?.trade_date, prefer]);
 
   if (indexError || error) {
-    return <section className="section"><div className="container"><h1 className="heading">Report unavailable</h1><p className="lede">{indexError || error}</p><a className="btn btn-outline" href="#/runs">See past runs</a></div></section>;
+    return (
+      <section className="bg-paper-white py-80">
+        <div className={container}>
+          <h1 className={`${heading} mb-16`}>Report unavailable</h1>
+          <p className="mb-24 text-subheading">{indexError || error}</p>
+          <a className={`${button.outline} ${focusRing}`} href="#/runs">See past runs</a>
+        </div>
+      </section>
+    );
   }
-  if (!run) return <section className="section"><div className="container"><p className="muted">Loading report…</p></div></section>;
+  if (!run) return <section className="bg-paper-white py-80"><div className={container}><p className="text-pebble">Loading report…</p></div></section>;
 
   const { decision: d, traderPlan: t, researchPlan: rp, settings } = run;
+  const base = `#/report/${encodeURIComponent(run.ticker)}/${run.tradeDate}`;
   const setSource = (s) => go(`/report/${encodeURIComponent(run.ticker)}/${run.tradeDate}${s === 'report_tree' ? '?source=report_tree' : ''}`);
   const toc = [
     ['decision', 'Decision'], ['trader', 'Trader plan'], ['research', 'Research manager'],
@@ -57,111 +81,112 @@ export default function Report({ ctx, ticker, date, source }) {
     ...run.analysts.map((a) => [`analyst-${a.key}`, a.title]),
     ['settings', 'Run details'],
   ];
+  const seg = (on) => `flex-1 cursor-pointer rounded-full-2 px-12 py-6 font-wealthsimple-sans text-caption leading-control tracking-control ${on ? 'bg-charcoal text-paper-white' : 'text-graphite-ink'} ${focusRing}`;
 
   return (
     <>
-      <section className="hero hero-report">
-        <div className="hero-inner">
-          <Eyebrow className="on-dark">Portfolio manager · research rating{run.isSample ? ' · SAMPLE' : ''}</Eyebrow>
-          <h1 className="display">{run.isReview ? 'Review' : run.rating}</h1>
-          <p className="hero-meta">{run.ticker} · analysis date {run.tradeDate}{settings?.version ? ` · TradingAgents ${settings.version}` : ''}</p>
-          <RatingScale rating={run.rating} onDark />
-          {run.isReview && <p className="hero-lede">No rating could be read from the decision, so this run is recorded for review, not as a position.</p>}
-          {d.executiveSummary && <p className="hero-lede"><Inline text={d.executiveSummary} /></p>}
-          <p className="hero-fine">A research opinion written by language models. Paper only; no orders are placed.</p>
-        </div>
-      </section>
+      <BronzeHero>
+        <Eyebrow onDark>Portfolio manager · research rating{run.isSample ? ' · SAMPLE' : ''}</Eyebrow>
+        <h1 className={`${heroText.display} mb-8`}>{run.isReview ? 'Review' : run.rating}</h1>
+        <p className="mb-24 text-subheading leading-subheading text-paper-white/80">
+          {run.ticker} · analysis date {run.tradeDate}{settings?.version ? ` · TradingAgents ${settings.version}` : ''}
+        </p>
+        <div className="mb-32"><RatingScale rating={run.rating} onDark /></div>
+        {run.isReview && <p className={heroText.lede}>No rating could be read from the decision, so this run is recorded for review, not as a position.</p>}
+        {d.executiveSummary && <p className={heroText.lede}><Inline text={d.executiveSummary} /></p>}
+        <p className={heroText.fine}>A research opinion written by language models. Research tool, not financial advice. No orders are placed.</p>
+      </BronzeHero>
 
-      <section className="section section-tight">
-        <div className="container report-grid">
-          <nav className="toc" aria-label="Report sections">
-            <p className="toc-title">On this page</p>
-            <ul>{toc.map(([id, label]) => <li key={id}><a href={`#/report/${encodeURIComponent(run.ticker)}/${run.tradeDate}`} onClick={(e) => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }}>{label}</a></li>)}</ul>
-            <div className="toc-source">
-              <p className="toc-title">Read from</p>
-              <div className="segmented segmented-small" role="radiogroup" aria-label="Source">
-                <button type="button" className={`segment ${prefer === 'state_log' ? 'is-on' : ''}`} onClick={() => setSource('state_log')} aria-pressed={prefer === 'state_log'}>JSON log</button>
-                <button type="button" className={`segment ${prefer === 'report_tree' ? 'is-on' : ''}`} onClick={() => setSource('report_tree')} aria-pressed={prefer === 'report_tree'}>Markdown</button>
+      <section className="bg-paper-white pt-48 pb-80">
+        <div className={`${container} grid items-start gap-32 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-48`}>
+          <nav aria-label="Report sections" className="text-caption lg:sticky lg:top-24 lg:pt-32">
+            <p className="mb-8 hidden text-pebble lg:block">On this page</p>
+            <ul className="mb-32 hidden lg:block">
+              {toc.map(([id, label]) => (
+                <li key={id}>
+                  <a href={base} className={`block border-b border-stone py-6 no-underline hover:underline ${focusRing}`}
+                    onClick={(e) => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }}>{label}</a>
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap items-center gap-x-12 gap-y-8 lg:block">
+              <p className="text-pebble lg:mb-8">Read from</p>
+              <div className="flex gap-4 rounded-full-2 border border-stone bg-paper-white p-4" role="group" aria-label="Source">
+                <button type="button" className={seg(prefer === 'state_log')} onClick={() => setSource('state_log')} aria-pressed={prefer === 'state_log'}>JSON log</button>
+                <button type="button" className={seg(prefer === 'report_tree')} onClick={() => setSource('report_tree')} aria-pressed={prefer === 'report_tree'}>Markdown</button>
               </div>
             </div>
           </nav>
 
-          <div className="report-body">
+          <div className="grid min-w-0 gap-24">
             {run.isSample && <SampleBanner />}
 
-            <article className="report-section" id="decision">
-              <Eyebrow>Portfolio manager</Eyebrow>
-              <h2 className="heading">Decision</h2>
-              <div className="kv-row">
+            <Section id="decision" eyebrowText="Portfolio manager" title="Decision">
+              <div className="mt-24 mb-8 grid gap-24 sm:grid-cols-3">
                 <KeyValue label="Research rating" value={run.rating} />
                 <KeyValue label="Price target" value={d.priceTarget} note="Research estimate, not an order" />
                 <KeyValue label="Time horizon" value={d.timeHorizon} />
               </div>
               {d.investmentThesis
-                ? <><h3 className="minor">Investment thesis</h3><Markdown text={d.investmentThesis} /></>
-                : <Markdown text={d.raw} />}
-            </article>
+                ? <><h3 className={subTitle}>Investment thesis</h3><Markdown className={prose} text={d.investmentThesis} /></>
+                : <Markdown className={prose} text={d.raw} />}
+            </Section>
 
-            <article className="report-section" id="trader">
-              <Eyebrow>Trading team · paper proposal</Eyebrow>
-              <h2 className="heading">Trader plan</h2>
-              <div className="kv-row kv-row-4">
+            <Section id="trader" eyebrowText="Trading team · paper proposal" title="Trader plan">
+              <div className="mt-24 mb-32 grid gap-24 sm:grid-cols-2 xl:grid-cols-4">
                 <KeyValue label="Proposed action" value={t.action} note="Paper only" />
                 <KeyValue label="Entry level" value={t.entryPrice} />
                 <KeyValue label="Stop level" value={t.stopLoss} />
                 <KeyValue label="Sizing" value={t.positionSizing} />
               </div>
-              {t.reasoning ? <Markdown text={t.reasoning} /> : <Markdown text={t.raw} />}
-            </article>
+              <Markdown className={prose} text={t.reasoning || t.raw} />
+            </Section>
 
-            <article className="report-section" id="research">
-              <Eyebrow>Research team</Eyebrow>
-              <h2 className="heading">Research manager</h2>
-              <div className="kv-row"><KeyValue label="Recommendation" value={rp.recommendation} /></div>
-              {rp.rationale && <><h3 className="minor">Rationale</h3><Markdown text={rp.rationale} /></>}
-              {rp.strategicActions && <><h3 className="minor">Strategic actions</h3><Markdown text={rp.strategicActions} /></>}
-              {!rp.rationale && !rp.strategicActions && <Markdown text={rp.raw} />}
-            </article>
+            <Section id="research" eyebrowText="Research team" title="Research manager">
+              <div className="mt-24 grid gap-24 sm:grid-cols-3"><KeyValue label="Recommendation" value={rp.recommendation} /></div>
+              {rp.rationale && <><h3 className={subTitle}>Rationale</h3><Markdown className={prose} text={rp.rationale} /></>}
+              {rp.strategicActions && <><h3 className={subTitle}>Strategic actions</h3><Markdown className={prose} text={rp.strategicActions} /></>}
+              {!rp.rationale && !rp.strategicActions && <Markdown className={prose} text={rp.raw} />}
+            </Section>
 
-            <article className="report-section" id="debate">
-              <Eyebrow>Research debate · {run.debate.turns.length} turns</Eyebrow>
-              <h2 className="heading">Bull vs. bear</h2>
-              <Turns turns={run.debate.turns} speakers={['Bull Analyst', 'Bear Analyst']} />
-            </article>
+            <Section id="debate" eyebrowText={`Research debate · ${run.debate.turns.length} turns`} title="Bull vs. bear">
+              <Turns turns={run.debate.turns} />
+            </Section>
 
-            <article className="report-section" id="risk">
-              <Eyebrow>Risk management · {run.risk.turns.length} turns</Eyebrow>
-              <h2 className="heading">Risk view</h2>
-              <Turns turns={run.risk.turns} speakers={['Aggressive Analyst', 'Conservative Analyst', 'Neutral Analyst']} />
-            </article>
+            <Section id="risk" eyebrowText={`Risk management · ${run.risk.turns.length} turns`} title="Risk view">
+              <Turns turns={run.risk.turns} />
+            </Section>
 
             {run.analysts.map((a) => (
-              <article className="report-section" id={`analyst-${a.key}`} key={a.key}>
-                <Eyebrow>Analyst team · {a.agent}</Eyebrow>
-                <h2 className="heading">{a.title}</h2>
+              <Section key={a.key} id={`analyst-${a.key}`} eyebrowText={`Analyst team · ${a.agent}`} title={a.title}>
                 {a.sentiment && (
-                  <div className="kv-row">
+                  <div className="mt-24 mb-32 grid gap-24 sm:grid-cols-3">
                     <KeyValue label="Overall sentiment" value={a.sentiment.band} />
                     <KeyValue label="Score" value={`${a.sentiment.score.toFixed(1)} / 10`} />
                     <KeyValue label="Confidence" value={a.sentiment.confidence} />
                   </div>
                 )}
-                <Markdown text={a.sentiment ? a.body.replace(/^\*\*Overall Sentiment:\*\*.*\n\*\*Confidence:\*\*.*\n?/, '') : a.body} />
-              </article>
+                <Markdown className={prose} text={a.sentiment ? a.body.replace(/^\*\*Overall Sentiment:\*\*.*\n\*\*Confidence:\*\*.*\n?/, '') : a.body} />
+              </Section>
             ))}
 
-            <article className="report-section" id="settings">
-              <Eyebrow>Provenance</Eyebrow>
-              <h2 className="heading">Run details</h2>
-              <dl className="details">
-                <div><dt>Source</dt><dd><code>{run.source.kind === 'state_log' ? 'full_states_log JSON' : 'report tree (markdown)'}</code></dd></div>
-                {run.source.path && <div><dt>Path</dt><dd><code className="wrap">{run.source.path}</code></dd></div>}
-                {settings?.llm_provider && <div><dt>Provider</dt><dd>{settings.llm_provider}</dd></div>}
-                {settings?.deep_think_llm && <div><dt>Models</dt><dd>deep {settings.deep_think_llm}, quick {settings.quick_think_llm}</dd></div>}
-                {settings?.analysts && <div><dt>Analysts</dt><dd>{settings.analysts.map(analystLabel).join(', ')}</dd></div>}
-                {settings && <div><dt>Debate rounds</dt><dd>research {settings.max_debate_rounds ?? '?'}, risk {settings.max_risk_discuss_rounds ?? '?'}</dd></div>}
+            <Section id="settings" eyebrowText="Provenance" title="Run details">
+              <dl className="mt-16 max-w-[48em]">
+                {[
+                  ['Source', <code key="s" className="rounded-sm bg-fog-veil px-4 font-mono text-caption">{run.source.kind === 'state_log' ? 'full_states_log JSON' : 'report tree (markdown)'}</code>],
+                  run.source.path && ['Path', <code key="p" className="break-all rounded-sm bg-fog-veil px-4 font-mono text-caption">{run.source.path}</code>],
+                  settings?.llm_provider && ['Provider', settings.llm_provider],
+                  settings?.deep_think_llm && ['Models', `deep ${settings.deep_think_llm}, quick ${settings.quick_think_llm}`],
+                  settings?.analysts && ['Analysts', settings.analysts.map(analystLabel).join(', ')],
+                  settings && ['Debate rounds', `research ${settings.max_debate_rounds ?? '?'}, risk ${settings.max_risk_discuss_rounds ?? '?'}`],
+                ].filter(Boolean).map(([k, v]) => (
+                  <div key={k} className="grid gap-4 border-t border-stone py-12 sm:grid-cols-[160px_minmax(0,1fr)] sm:gap-16">
+                    <dt className="text-caption text-pebble">{k}</dt>
+                    <dd className="min-w-0 break-words">{v}</dd>
+                  </div>
+                ))}
               </dl>
-            </article>
+            </Section>
           </div>
         </div>
       </section>
