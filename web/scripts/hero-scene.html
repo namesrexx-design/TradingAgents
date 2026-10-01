@@ -1,0 +1,232 @@
+<!doctype html>
+<!--
+  TradingAgents web dashboard: hero sculpture scene (render source, not shipped).
+  Modified by BizBox: added web dashboard. Licensed under the Apache License 2.0
+  (see LICENSE and NOTICE at the repository root).
+
+  DESIGN.md "Sculptural 3D Illustration": a twisted paper ribbon that rises like
+  a line chart, matte paper, soft studio light, floating over a warm-cream floor
+  with a soft ambient shadow. The floor fades to transparent at its rim, so the
+  render sits on the Bronze Field hero with a radial fade and no hard edge.
+  Rendered once to a still by scripts/render-hero.mjs.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>html, body { margin: 0; background: transparent; } canvas { display: block; }</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/web/node_modules/three/build/three.module.js",
+  "three/addons/": "/web/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const params = new URLSearchParams(location.search);
+const W = Number(params.get('w') || 1400);
+const H = Number(params.get('h') || 1200);
+// 'hero': the full form, for the Bronze hero. 'detail': a closer three-quarter
+// view of the same object, for the light editorial section.
+const VIEW = params.get('view') || 'hero';
+
+// Paper colors come from tokens.css; sage and terracotta are the illustration
+// pigments DESIGN.md names ("sage green, cream, terracotta, and off-white").
+// Color appears only inside the illustration, per DESIGN.md.
+const res = await fetch('/docs/design/refero/wealthsimple/tokens.css').catch(() => null);
+const css = res && res.ok ? await res.text() : '';
+const token = (name, fallback) => (css.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`)) || [])[1] || fallback;
+const PAPER = token('color-paper-white', '#fcfcfc');
+const CREAM = token('color-linen-cream', '#faf8f5');
+const SAGE = '#8d9c82';
+const TERRACOTTA = '#c2735a';
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(2); // supersampled, then reduced to W x H below
+renderer.setSize(W, H);
+renderer.setClearColor(0x000000, 0);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 0.92;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.6;
+
+const camera = new THREE.PerspectiveCamera(26, W / H, 0.1, 100);
+if (VIEW === 'detail') {
+  camera.position.set(5.2, 3.0, 10.4);
+  camera.lookAt(0.0, 1.05, 0.2);
+} else {
+  camera.position.set(0.3, 3.8, 14.2);
+  camera.lookAt(-0.15, 1.0, 0);
+}
+
+// Soft key light from upper left; VSM blur gives the gallery-soft shadow.
+const key = new THREE.DirectionalLight(0xffffff, 1.6);
+key.position.set(-2.2, 9, 3.2);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.camera.left = -5; key.shadow.camera.right = 5;
+key.shadow.camera.top = 5; key.shadow.camera.bottom = -5;
+key.shadow.radius = 10;
+key.shadow.blurSamples = 25;
+key.shadow.bias = -0.0005;
+scene.add(key);
+const fill = new THREE.HemisphereLight(0xffffff, new THREE.Color(CREAM), 0.55);
+scene.add(fill);
+
+// ---------------------------------------------------------------- ribbon
+// A line chart in three dimensions: it climbs left to right with two
+// pullbacks, and the paper turns over along its length.
+const path = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-2.35, 0.42, 0.75),
+  new THREE.Vector3(-1.75, 1.05, 0.05),
+  new THREE.Vector3(-1.05, 0.8, 0.45),
+  new THREE.Vector3(-0.35, 1.55, 0.0),
+  new THREE.Vector3(0.3, 1.25, 0.4),
+  new THREE.Vector3(1.0, 2.05, 0.05),
+  new THREE.Vector3(1.6, 1.85, -0.3),
+  new THREE.Vector3(2.35, 2.75, 0.1),
+], false, 'centripetal');
+
+const SEG = 600;
+const WIDTH = 0.52;
+const frames = path.computeFrenetFrames(SEG, false);
+const pos = [];
+const nor = [];
+const uv = [];
+const idx = [];
+for (let i = 0; i <= SEG; i += 1) {
+  const t = i / SEG;
+  const p = path.getPointAt(t);
+  const n = frames.normals[i];
+  const b = frames.binormals[i];
+  // One and a quarter turns, eased so the ends lie calm.
+  const a = Math.PI * 0.25 + Math.PI * 2.5 * (t - Math.sin(2 * Math.PI * t) / (2 * Math.PI));
+  const w = WIDTH * (0.82 + 0.18 * Math.sin(Math.PI * t));
+  const dir = new THREE.Vector3().addScaledVector(b, Math.cos(a)).addScaledVector(n, Math.sin(a)).normalize();
+  const l = p.clone().addScaledVector(dir, -w / 2);
+  const r = p.clone().addScaledVector(dir, w / 2);
+  pos.push(l.x, l.y, l.z, r.x, r.y, r.z);
+  // Analytic normal (across x along): averaged vertex normals go NaN in the tight folds.
+  const nrm = new THREE.Vector3().crossVectors(dir, frames.tangents[i]).normalize();
+  nor.push(nrm.x, nrm.y, nrm.z, nrm.x, nrm.y, nrm.z);
+  uv.push(t, 0, t, 1);
+  if (i < SEG) {
+    const k = i * 2;
+    idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2);
+  }
+}
+const geo = new THREE.BufferGeometry();
+geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+geo.setIndex(idx);
+
+// Fine paper tooth: a little roughness noise so it reads as matte stock.
+const tooth = (() => {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g = c.getContext('2d');
+  const img = g.createImageData(256, 256);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = 238 + Math.random() * 14;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+    img.data[i + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(24, 2);
+  return tex;
+})();
+
+const paperFront = new THREE.MeshStandardMaterial({ color: new THREE.Color(PAPER), roughness: 0.92, metalness: 0, side: THREE.FrontSide });
+const paperBack = new THREE.MeshStandardMaterial({ color: new THREE.Color(SAGE), roughness: 0.95, metalness: 0, side: THREE.BackSide });
+for (const m of [paperFront, paperBack]) {
+  const mesh = new THREE.Mesh(geo, m);
+  mesh.castShadow = true;
+  mesh.receiveShadow = false; // self-shadowing paper speckles under VSM
+  scene.add(mesh);
+}
+
+// A terracotta pebble on the floor where the line begins.
+const pebble = new THREE.Mesh(
+  new THREE.SphereGeometry(0.34, 96, 64),
+  new THREE.MeshStandardMaterial({ color: new THREE.Color(TERRACOTTA), roughness: 0.85, metalness: 0 }),
+);
+pebble.scale.set(1.15, 0.78, 1.0);
+pebble.position.set(-1.85, 0.265, 1.0);
+pebble.castShadow = true;
+pebble.receiveShadow = true;
+scene.add(pebble);
+
+// ---------------------------------------------------------------- floor
+// Warm-cream floor that fades to nothing at its rim: the radial wash.
+const fade = (() => {
+  const c = document.createElement('canvas');
+  c.width = c.height = 1024;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(512, 512, 0, 512, 512, 512);
+  // alphaMap reads the green channel, so the fade is drawn in grey, opaque.
+  grad.addColorStop(0, 'rgb(255,255,255)');
+  grad.addColorStop(0.3, 'rgb(248,248,248)');
+  grad.addColorStop(0.6, 'rgb(170,170,170)');
+  grad.addColorStop(0.85, 'rgb(48,48,48)');
+  grad.addColorStop(1, 'rgb(0,0,0)');
+  g.fillStyle = 'rgb(0,0,0)';
+  g.fillRect(0, 0, 1024, 1024);
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 1024, 1024);
+  return new THREE.CanvasTexture(c);
+})();
+const floor = new THREE.Mesh(
+  new THREE.CircleGeometry(3.4, 128),
+  new THREE.MeshStandardMaterial({ color: new THREE.Color(CREAM), roughness: 1, metalness: 0, alphaMap: fade, transparent: true, depthWrite: false }),
+);
+floor.rotation.x = -Math.PI / 2;
+floor.position.set(0.0, 0, 0.3);
+floor.receiveShadow = true;
+scene.add(floor);
+
+// Contact occlusion under the pebble, where geometry meets the floor.
+const blob = (() => {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  grad.addColorStop(0, 'rgba(40,32,24,0.55)');
+  grad.addColorStop(1, 'rgba(40,32,24,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 256, 256);
+  return new THREE.CanvasTexture(c);
+})();
+for (const [x, z, s] of [[-1.85, 1.0, 1.15]]) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: blob, transparent: true, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2;
+  m.position.set(x, 0.002, z);
+  scene.add(m);
+}
+
+renderer.render(scene, camera);
+const out = document.createElement('canvas');
+out.width = W;
+out.height = H;
+const g2 = out.getContext('2d');
+g2.imageSmoothingEnabled = true;
+g2.imageSmoothingQuality = 'high';
+g2.drawImage(renderer.domElement, 0, 0, W, H);
+window.__png = out.toDataURL('image/png');
+window.__webp = out.toDataURL('image/webp', 0.92);
+window.__done = true;
+</script>
+</body>
+</html>

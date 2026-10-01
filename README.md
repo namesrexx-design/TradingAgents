@@ -384,6 +384,10 @@ What does not vary anymore: the analyzed company identity is resolved determinis
 
 Backtest results are not guaranteed to match any published figure. Returns depend on the model, the temperature, the date range, data quality, and the sampling above. Treat the framework as a research scaffold for studying multi-agent analysis, not as a strategy with a fixed, replicable return.
 
+## Web dashboard (fork changes)
+
+Modified by BizBox: added web dashboard. This fork ([namesrexx-design/TradingAgents](https://github.com/namesrexx-design/TradingAgents)) adds `web/`, a browser dashboard for runs: run setup, a live view of each agent and the bull/bear and risk debates, the final report, and past runs. It reads the state log and report tree a run writes, and ships a clearly marked SAMPLE run (fictional ticker `DEMO`) so it can be previewed with no Python and no keys. `web/bridge/server.py` is a FastAPI stub showing how the dashboard starts a `TradingAgentsGraph` run and streams its state; API keys stay in the server's `.env`. Research tool, not financial advice; it places no orders and has no broker integration. See [web/README.md](web/README.md) and [NOTICE](NOTICE). The original project is licensed under Apache-2.0 (see [LICENSE](LICENSE)).
+
 ## Contributing
 
 Contributions are welcome: bug fixes, documentation, and feature ideas; past contributions are credited per release in [`CHANGELOG.md`](CHANGELOG.md).

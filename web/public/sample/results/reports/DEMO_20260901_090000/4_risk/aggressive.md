@@ -1,0 +1,2 @@
+
+Aggressive Analyst: SAMPLE — illustrative, not real analysis. Three percent is timid for a setup with a dated catalyst and a net-cash balance sheet. The stop is wide enough that sizing up doesn't add much tail risk.

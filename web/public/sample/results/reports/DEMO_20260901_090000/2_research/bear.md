@@ -1,0 +1,2 @@
+
+Bear Analyst: SAMPLE — illustrative, not real analysis. A one-point margin drop in a quarter with a product refresh is exactly when margins should be expanding. Sentiment is only Mixed, the supplier note is a real execution risk, and 9% growth doesn't earn a premium. If the launch slips, the trend support at the 50-day average is the first thing to give.

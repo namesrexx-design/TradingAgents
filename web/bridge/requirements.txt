@@ -1,0 +1,4 @@
+# TradingAgents web dashboard bridge (stub). Modified by BizBox: added web dashboard. Apache-2.0.
+# Install the framework first (pip install . from the repo root), then:
+fastapi>=0.115
+uvicorn>=0.30

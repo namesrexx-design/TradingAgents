@@ -1,0 +1,46 @@
+/*
+ * TradingAgents web dashboard: font substitutes.
+ * Modified by BizBox: added web dashboard. Licensed under the Apache License 2.0
+ * (see LICENSE and NOTICE at the repository root).
+ *
+ * tokens.css names three families that are not licensed for this project.
+ * DESIGN.md lists substitutes for each (Tiempos -> Source Serif 4; The Future and
+ * Wealthsimple Sans -> Inter). They are registered under the token family names,
+ * so tokens.css stays exactly as exported and every rule keeps using
+ * var(--font-tiempos) and friends. Font files come from @fontsource (OFL).
+ */
+@font-face {
+  font-family: 'Tiempos';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/source-serif-4/files/source-serif-4-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Tiempos';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/source-serif-4/files/source-serif-4-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'The Future';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'The Future';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/inter/files/inter-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Wealthsimple Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2') format('woff2');
+}

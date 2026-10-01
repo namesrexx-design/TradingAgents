@@ -1,0 +1,17 @@
+/*
+ * TradingAgents web dashboard: stylesheet entry.
+ * Modified by BizBox: added web dashboard. Licensed under the Apache License 2.0
+ * (see LICENSE and NOTICE at the repository root).
+ *
+ * 1. Tailwind v4.
+ * 2. The Refero Wealthsimple export's tailwind.css, imported unchanged: its
+ *    @theme generates the utilities the components use (bg-bronze-field,
+ *    text-graphite-ink, font-tiempos, text-display, p-32, rounded-full, ...).
+ * 3. Our clearly marked additions to that theme.
+ * 4. Font substitutes registered under the export's family names.
+ * tokens.css itself is loaded from main.jsx.
+ */
+@import "tailwindcss";
+@import "../../../docs/design/refero/wealthsimple/tailwind.css";
+@import "./theme-extensions.css";
+@import "./fonts.css";
